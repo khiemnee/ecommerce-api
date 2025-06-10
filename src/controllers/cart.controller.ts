@@ -25,7 +25,7 @@ export const getCart = async (req: Request, res: Response) => {
       });
       return;
     }
-    await client.setEx(req.key.toString(),60,JSON.stringify(cart))
+    await client.setEx(req.key.toString(),30,JSON.stringify(cart))
     res.status(200).send(cart);
   } catch (error) {
     if (error instanceof Error) {

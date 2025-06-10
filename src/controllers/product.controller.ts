@@ -55,7 +55,7 @@ export const getProduct = async (req: Request, res: Response) => {
       });
       return;
     }
-    await client.setEx(req.key.toString(),1800,JSON.stringify(product))
+    await client.setEx(req.key.toString(),300,JSON.stringify(product))
     res.status(200).send(product);
   } catch (error) {
     if (error instanceof Error) {

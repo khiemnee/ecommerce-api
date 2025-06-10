@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import Stripe from "stripe";
+import client from "../helpers/redis.helper";
 
 const prisma = new PrismaClient();
 const stripe = new Stripe(
@@ -70,7 +71,7 @@ export const userOrders = async (req: Request, res: Response) => {
       });
       return;
     }
-
+    await client.setEx(req.key.toString(),300,JSON.stringify(order))
     res.status(200).send(order);
   } catch (error) {
     if (error instanceof Error) {
