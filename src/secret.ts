@@ -7,3 +7,5 @@ export const refeshTokenKey = process.env.refeshTokenKey
 export const cloudName = process.env.cloudName
 export const cloudApi = process.env.cloudApi
 export const cloudApiSecret = process.env.cloudApiSecret
+export const stripeKey = process.env.stripeKey
+export const stripeEndPoint = process.env.stripeEndPoint

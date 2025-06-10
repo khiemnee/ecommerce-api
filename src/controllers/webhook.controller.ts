@@ -2,16 +2,16 @@ import { Request, Response } from "express";
 import Stripe from "stripe";
 import { PrismaClient } from "@prisma/client";
 import { cartTotal } from "../helpers/cartTotal.helper";
+import { stripeEndPoint, stripeKey } from "../secret";
 
 const stripe = new Stripe(
-  "sk_test_51RRp4nRXAUlge4QtqtZD24uXNDEtsikJZd95RaDF6kILHcXOaO3HmtUhjxl49iWFrca6hSrRkLFqT87zRrpXR76F008opPm98u"
+  stripeKey!
 );
 const prisma = new PrismaClient();
 
 export const webHookOrder = async (req: Request, res: Response) => {
   const sig = req.headers["stripe-signature"] as string;
-  const endpointSecret =
-    "whsec_2f2cf9db9abdc64432059450bf1024a18ce58c180ae9ad0e776dca9df793f79c";
+  const endpointSecret = stripeEndPoint!
 
   let event;
 
