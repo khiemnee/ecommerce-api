@@ -9,3 +9,7 @@ export const cloudApi = process.env.cloudApi
 export const cloudApiSecret = process.env.cloudApiSecret
 export const stripeKey = process.env.stripeKey
 export const stripeEndPoint = process.env.stripeEndPoint
+export const redisUserName = process.env.redisUserName
+export const redisPassword = process.env.redisPassword
+export const redisPort = process.env.redisPort
+export const redisHost = process.env.redisHost
