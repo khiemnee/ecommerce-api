@@ -7,10 +7,10 @@ import orderRouter from './routers/order.router'
 import webHookRouter from './routers/webhook.router'
 import cookieParse from 'cookie-parser'
 import cors from 'cors'
+import { port } from './secret'
 
 
 const app =  express()
-const port = 3000
 app.use('/api/webhook',webHookRouter)
 app.use(express.json())
 app.use(cookieParse())

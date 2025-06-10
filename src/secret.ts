@@ -13,3 +13,4 @@ export const redisUserName = process.env.redisUserName
 export const redisPassword = process.env.redisPassword
 export const redisPort = process.env.redisPort
 export const redisHost = process.env.redisHost
+export const port = process.env.port
