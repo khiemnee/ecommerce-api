@@ -2,8 +2,10 @@ import cloudinary from "./cloudinary.helper";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
 
+
+
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary,
   params: async (req, file) => {
     return {
       folder: "demo",

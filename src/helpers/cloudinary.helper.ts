@@ -1,7 +1,7 @@
-import { v2 as cloudinary } from 'cloudinary'
+import  cloudinary from 'cloudinary'
 import { cloudApi, cloudApiSecret, cloudName } from '../secret';
 
-cloudinary.config({ 
+cloudinary.v2.config({ 
   cloud_name: cloudName, 
   api_key: cloudApi, 
   api_secret: cloudApiSecret
