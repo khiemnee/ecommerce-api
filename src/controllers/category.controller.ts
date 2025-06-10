@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { error } from "console";
 import { Request,Response } from "express";
+import client from "../helpers/redis.helper";
 
 const prisma = new PrismaClient()
 
@@ -36,7 +37,7 @@ export const getCategory = async (req:Request,res:Response) =>{
             })
             return
         }
-
+        await client.setEx(req.key.toString(),3600,JSON.stringify(categories))
         res.status(200).send(categories)
     } catch (error) {
         if(error instanceof Error){

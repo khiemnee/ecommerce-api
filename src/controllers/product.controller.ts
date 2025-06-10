@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { error } from "console";
 import { Request, Response } from "express";
+import client from "../helpers/redis.helper";
 
 const prisma = new PrismaClient();
 
@@ -30,6 +30,7 @@ export const getProducts = async (req: Request, res: Response) => {
       return;
     }
 
+    await client.setEx(req.key.toString(), 3600,JSON.stringify(products));
     res.status(200).send(products);
   } catch (error) {
     if (error instanceof Error) {
@@ -54,7 +55,7 @@ export const getProduct = async (req: Request, res: Response) => {
       });
       return;
     }
-
+    await client.setEx(req.key.toString(),1800,JSON.stringify(product))
     res.status(200).send(product);
   } catch (error) {
     if (error instanceof Error) {
@@ -155,27 +156,26 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteProduct = async(req:Request,res:Response) =>{
+export const deleteProduct = async (req: Request, res: Response) => {
+  const id = req.params.id;
 
-    const id = req.params.id
+  try {
+    const product = await prisma.product.delete({
+      where: {
+        id,
+      },
+    });
 
-    try {
-        const product = await prisma.product.delete({
-            where : {
-                id
-            }
-        })
-
-        if(!product){
-            res.status(500).send({
-                error : 'product not found'
-            })
-        }
-
-        res.status(200).send(product)
-    } catch (error) {
-        if(error instanceof Error){
-            res.status(500).send(error.message)
-        }
+    if (!product) {
+      res.status(500).send({
+        error: "product not found",
+      });
     }
-}
+
+    res.status(200).send(product);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).send(error.message);
+    }
+  }
+};

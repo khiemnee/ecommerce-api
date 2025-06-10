@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import client from "../helpers/redis.helper";
 
 const prisma = new PrismaClient();
 
@@ -24,7 +25,7 @@ export const getCart = async (req: Request, res: Response) => {
       });
       return;
     }
-
+    await client.setEx(req.key.toString(),60,JSON.stringify(cart))
     res.status(200).send(cart);
   } catch (error) {
     if (error instanceof Error) {
