@@ -6,6 +6,7 @@ import cartRouter from './routers/cart.router'
 import orderRouter from './routers/order.router'
 import webHookRouter from './routers/webhook.router'
 import cookieParse from 'cookie-parser'
+import cors from 'cors'
 
 
 const app =  express()
@@ -18,6 +19,7 @@ app.use('/api/products',productRouter)
 app.use('/api/categories',categoriesRouter)
 app.use('/api/cart',cartRouter)
 app.use('/api/order',orderRouter)
+app.use(cors())
 
 app.listen(port,()=>{
     console.log('server is up')
