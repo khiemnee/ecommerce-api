@@ -4,6 +4,7 @@ import productRouter from './routers/product.router'
 import categoriesRouter from './routers/category.router'
 import cartRouter from './routers/cart.router'
 import orderRouter from './routers/order.router'
+import reviewRouter from './routers/reviews.router'
 import webHookRouter from './routers/webhook.router'
 import cookieParse from 'cookie-parser'
 import cors from 'cors'
@@ -19,6 +20,7 @@ app.use('/api/products',productRouter)
 app.use('/api/categories',categoriesRouter)
 app.use('/api/cart',cartRouter)
 app.use('/api/order',orderRouter)
+app.use('/api/reviews',reviewRouter)
 app.use(cors())
 
 app.listen(port,()=>{
