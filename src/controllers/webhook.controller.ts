@@ -2,12 +2,10 @@ import { Request, Response } from "express";
 import Stripe from "stripe";
 import { PrismaClient } from "@prisma/client";
 import { stripeEndPoint, stripeKey } from "../secret";
-import { MailService } from "@sendgrid/mail";
 import sendMail from "../helpers/sendEmail.helper";
 
 const stripe = new Stripe(stripeKey!);
 const prisma = new PrismaClient();
-const sgMail = new MailService();
 
 export const webHookOrder = async (req: Request, res: Response) => {
   const sig = req.headers["stripe-signature"] as string;
