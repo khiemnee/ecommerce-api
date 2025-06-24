@@ -2,11 +2,10 @@ import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import Stripe from "stripe";
 import client from "../helpers/redis.helper";
+import { stripeApiKey } from "../secret";
 
 const prisma = new PrismaClient();
-const stripe = new Stripe(
-  "sk_test_51RRp4nRXAUlge4QtqtZD24uXNDEtsikJZd95RaDF6kILHcXOaO3HmtUhjxl49iWFrca6hSrRkLFqT87zRrpXR76F008opPm98u"
-);
+const stripe = new Stripe(stripeApiKey!);
 
 export const orderCheckOut = async (req: Request, res: Response) => {
   try {
@@ -19,15 +18,15 @@ export const orderCheckOut = async (req: Request, res: Response) => {
       },
     });
 
-    if(!cartItems || cartItems.length === 0){
+    if (!cartItems || cartItems.length === 0) {
       res.status(500).send({
-        error :'nothing in cart to checkout, go shopping then comeback'
-      })
-      return
+        error: "Nothing in cart to checkout, go shopping then comeback",
+      });
+      return;
     }
 
     const session = await stripe.checkout.sessions.create({
-    payment_method_types : ['card'],
+      payment_method_types: ["card"],
       mode: "payment",
       line_items: cartItems.map((item) => ({
         price_data: {
@@ -41,12 +40,13 @@ export const orderCheckOut = async (req: Request, res: Response) => {
       })),
       success_url: "http://localhost:3000/success",
       cancel_url: "http://localhost:3000/cancel",
-      metadata : {
-        userId : req.user.id
-      }
+      metadata: {
+        userId: req.user.id,
+        voucher : req.body.voucher
+      },
     });
 
-    res.status(200).send(session.url)
+    res.status(200).send(session.url);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).send(error.message);
@@ -71,7 +71,7 @@ export const userOrders = async (req: Request, res: Response) => {
       });
       return;
     }
-    await client.setEx(req.key.toString(),300,JSON.stringify(order))
+    await client.setEx(req.key.toString(), 300, JSON.stringify(order));
     res.status(200).send(order);
   } catch (error) {
     if (error instanceof Error) {

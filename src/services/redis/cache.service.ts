@@ -9,6 +9,7 @@ export const productsCache = async (
   const cache = await client.get("products");
 
   if (cache) {
+    console.log('here')
     res.status(200).send(JSON.parse(cache));
     return;
   }

@@ -30,7 +30,7 @@ export const getProducts = async (req: Request, res: Response) => {
       return;
     }
 
-    await client.setEx(req.key.toString(), 3600,JSON.stringify(products));
+    await client.setEx(req.key.toString(), 3600, JSON.stringify(products));
     res.status(200).send(products);
   } catch (error) {
     if (error instanceof Error) {
@@ -55,8 +55,19 @@ export const getProduct = async (req: Request, res: Response) => {
       });
       return;
     }
-    await client.setEx(req.key.toString(),300,JSON.stringify(product))
-    res.status(200).send(product);
+
+    const productAvgRating = await prisma.review.aggregate({
+      where: {
+        productId: product.id,
+      },
+      _avg: {
+        rating: true,
+      },
+    });
+
+    const { _avg } = productAvgRating;
+   
+    res.status(200).send({ product, _avg });
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).send(error.message);

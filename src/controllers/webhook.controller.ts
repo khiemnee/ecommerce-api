@@ -4,14 +4,12 @@ import { PrismaClient } from "@prisma/client";
 import { cartTotal } from "../helpers/cartTotal.helper";
 import { stripeEndPoint, stripeKey } from "../secret";
 
-const stripe = new Stripe(
-  stripeKey!
-);
+const stripe = new Stripe(stripeKey!);
 const prisma = new PrismaClient();
 
 export const webHookOrder = async (req: Request, res: Response) => {
   const sig = req.headers["stripe-signature"] as string;
-  const endpointSecret = stripeEndPoint!
+  const endpointSecret = stripeEndPoint!;
 
   let event;
 
@@ -26,6 +24,7 @@ export const webHookOrder = async (req: Request, res: Response) => {
   if (event!.type === "checkout.session.completed") {
     const session = event.data.object;
     const userId = session.metadata!.userId;
+    const voucher = session.metadata!.voucher;
     const cartItems = await prisma.cartItem.findMany({
       where: {
         userId,
@@ -35,10 +34,17 @@ export const webHookOrder = async (req: Request, res: Response) => {
       },
     });
 
+    let total = await cartTotal(cartItems);
+
+    if (voucher) {
+      total = total - (total * Number(voucher)/100)
+
+    }
+
     const order = await prisma.order.create({
       data: {
         userId,
-        total: await cartTotal(cartItems),
+        total,
       },
     });
 
@@ -62,7 +68,6 @@ export const webHookOrder = async (req: Request, res: Response) => {
             stock: {
               decrement: values.quantity,
             },
-            
           },
           where: {
             id: values.product.id,
@@ -72,19 +77,19 @@ export const webHookOrder = async (req: Request, res: Response) => {
     );
 
     await prisma.order.update({
-        data : {
-            status :'PAID'
-        },
-        where : {
-            id : order.id
-        }
-    })
+      data: {
+        status: "PAID",
+      },
+      where: {
+        id: order.id,
+      },
+    });
 
     await prisma.cartItem.deleteMany({
       where: {
-        userId
+        userId,
       },
     });
-    res.status(200).send({order,orderItems})
+    res.status(200).send({ order, orderItems });
   }
 };

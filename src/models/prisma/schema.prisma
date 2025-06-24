@@ -96,6 +96,15 @@ model Review {
   createdAt DateTime @default(now())
 }
 
+model Voucher {
+  id         String   @id @default(uuid())  
+  code       String   @unique
+  discount   Int      // %
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
+
+
 enum OrderStatus {
   PENDING
   PAID
