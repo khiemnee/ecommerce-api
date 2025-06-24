@@ -16,9 +16,26 @@ Shopping Cart – Add, update, remove items, and clear the cart.
 
 Order Checkout – Stripe Checkout integration with webhook confirmation.
 
+Reviews – Users can review purchased products.
+
+Voucher Discounts – Apply discount vouchers during checkout.
+
 Caching – Redis caching for product, category, order, and cart endpoints.
 
 Admin Panel (API) – View all users and orders (admin-only routes).
+
+## 📧 Order Confirmation Email (SendGrid)
+
+After successful payment, the server sends a confirmation email using **SendGrid Email API**.
+
+The email includes:
+- Customer name and email
+  
+- Order summary and total price
+  
+- Payment method
+  
+- Timestamp of purchase
 
 🧱 Tech Stack
 
@@ -117,6 +134,16 @@ GET	/	Get orders for current user
 GET	/:id	Get specific order details
 
 GET	/all/admin	Admin: Get all orders
+
+💬 Reviews
+
+POST /:id Create review for product      
+GET /:id  Get reviews for a product
+
+🎟️ Vouchers
+
+POST   /  Admin: Create voucher              
+POST   /  apply Apply voucher to current cart 
 
 💳 Stripe Webhook
 
