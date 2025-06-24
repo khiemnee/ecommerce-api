@@ -26,14 +26,7 @@ const sendMail = async (data: any) => {
     subject: "Shopping bill",
     html,
   };
-  await sgMail
-    .send(msg)
-    .then(() => {
-      console.log("Email sent");
-    })
-    .catch((error) => {
-      console.error(error.message);
-    });
+  await sgMail.send(msg);
 };
 
 export default sendMail;
