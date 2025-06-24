@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import Stripe from "stripe";
 import client from "../helpers/redis.helper";
 import { stripeApiKey } from "../secret";
+import { cartTotal } from "../helpers/cartTotal.helper";
 
 const prisma = new PrismaClient();
 const stripe = new Stripe(stripeApiKey!);
@@ -25,6 +26,18 @@ export const orderCheckOut = async (req: Request, res: Response) => {
       return;
     }
 
+    const voucher = await prisma.voucher.findFirst({
+      where: {
+        code: req.body.voucher,
+      },
+    });
+
+    let total = await cartTotal(cartItems);
+
+    if (voucher) {
+      total = total - (total * Number(voucher.discount)) / 100;
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -38,11 +51,17 @@ export const orderCheckOut = async (req: Request, res: Response) => {
         },
         quantity: item.quantity,
       })),
+
+      discounts: [
+        {
+          coupon: voucher?.code,
+        },
+      ],
       success_url: "http://localhost:3000/success",
       cancel_url: "http://localhost:3000/cancel",
       metadata: {
         userId: req.user.id,
-        voucher : req.body.voucher
+        total,
       },
     });
 

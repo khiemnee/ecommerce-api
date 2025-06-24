@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
 import Stripe from "stripe";
 import { PrismaClient } from "@prisma/client";
-import { cartTotal } from "../helpers/cartTotal.helper";
 import { stripeEndPoint, stripeKey } from "../secret";
+import { MailService } from "@sendgrid/mail";
+import sendMail from "../helpers/sendEmail.helper";
 
 const stripe = new Stripe(stripeKey!);
 const prisma = new PrismaClient();
+const sgMail = new MailService();
 
 export const webHookOrder = async (req: Request, res: Response) => {
   const sig = req.headers["stripe-signature"] as string;
@@ -24,7 +26,7 @@ export const webHookOrder = async (req: Request, res: Response) => {
   if (event!.type === "checkout.session.completed") {
     const session = event.data.object;
     const userId = session.metadata!.userId;
-    const voucher = session.metadata!.voucher;
+    const total = Number(session.metadata!.total);
     const cartItems = await prisma.cartItem.findMany({
       where: {
         userId,
@@ -33,13 +35,6 @@ export const webHookOrder = async (req: Request, res: Response) => {
         product: true,
       },
     });
-
-    let total = await cartTotal(cartItems);
-
-    if (voucher) {
-      total = total - (total * Number(voucher)/100)
-
-    }
 
     const order = await prisma.order.create({
       data: {
@@ -90,6 +85,10 @@ export const webHookOrder = async (req: Request, res: Response) => {
         userId,
       },
     });
+
+    await sendMail(session)
+
+  
     res.status(200).send({ order, orderItems });
   }
 };
